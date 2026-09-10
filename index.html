@@ -149,6 +149,13 @@ body{font-family:var(--font-sans);background:var(--bg-main);color:var(--text-pri
 .li-badge{display:inline-block;font-size:11px;font-weight:var(--fw-semibold);line-height:1;color:var(--text-muted);
   background:var(--black-50);border:1px solid var(--border-default);border-radius:var(--radius-pill);padding:2px 7px;margin-right:6px;vertical-align:1px}
 
+/* ----- Row rate chip: fill rate (inventory) / won-slots rate (demand) ----- */
+.li-rate{flex:0 0 auto;display:inline-flex;align-items:center;font-size:12px;font-weight:var(--fw-bold);line-height:1;
+  padding:5px 9px;border-radius:var(--radius-pill);margin-right:8px;font-variant-numeric:tabular-nums;cursor:default}
+.li-rate--good{color:#16a34a;background:#dcf6e8}
+.li-rate--warn{color:#b45309;background:#fdecd0}
+.li-rate--bad{color:#dc2626;background:#fde3e3}
+
 /* ----- Needs-attention card ----- */
 .dash-top-viewall--accent{color:var(--accent)}
 .dash-top-viewall--accent:hover{color:var(--accent);text-decoration:underline}
@@ -249,36 +256,36 @@ const VERSION_META = { A:{name:'Top lists'}, B:{name:'New items'}, C:{name:'Acti
 const BOTTOM = {
   // A — leaderboards by volume/spend
   A: [
-    { type:'list', title:'Top Inventory', items:[
-      {name:'QA Inventory', sub:'28,450 requests'},
-      {name:'Roku — CTV Prime', sub:'19,220 requests'},
-      {name:'FireTV — Sports Live', sub:'11,905 requests'},
-      {name:'Samsung TV Plus — News', sub:'8,640 requests'},
-      {name:'Apple TV — Movies', sub:'6,120 requests'},
+    { type:'list', title:'Top Inventory', rateLabel:'Fill rate', items:[
+      {name:'QA Inventory', sub:'28,450 requests', rate:74},
+      {name:'Roku — CTV Prime', sub:'19,220 requests', rate:71},
+      {name:'FireTV — Sports Live', sub:'11,905 requests', rate:58},
+      {name:'Samsung TV Plus — News', sub:'8,640 requests', rate:69},
+      {name:'Apple TV — Movies', sub:'6,120 requests', rate:41},
     ]},
-    { type:'list', title:'Top Demand', items:[
-      {name:'Open Exchange — CTV', sub:'$3,120 spend'},
-      {name:'PMP Deal — Sports', sub:'$1,884 spend'},
-      {name:'Programmatic Guaranteed', sub:'$1,470 spend'},
-      {name:'House Direct Tag', sub:'$980 spend'},
-      {name:'Fallback Remnant', sub:'$645 spend'},
+    { type:'list', title:'Top Demand', rateLabel:'Won-slots rate', items:[
+      {name:'Open Exchange — CTV', sub:'$3,120 spend', rate:78},
+      {name:'PMP Deal — Sports', sub:'$1,884 spend', rate:73},
+      {name:'Programmatic Guaranteed', sub:'$1,470 spend', rate:61},
+      {name:'House Direct Tag', sub:'$980 spend', rate:55},
+      {name:'Fallback Remnant', sub:'$645 spend', rate:38},
     ]},
   ],
   // B — most recently added items
   B: [
-    { type:'list', title:'New Inventory', items:[
-      {name:'Vizio — Home Screen', sub:'added 2h ago'},
-      {name:'LG Channels — Kids', sub:'added 5h ago'},
-      {name:'Tubi — Late Night', sub:'added yesterday'},
-      {name:'Pluto — News 24', sub:'added 2d ago'},
-      {name:'Sling — Sports Extra', sub:'added 3d ago'},
+    { type:'list', title:'New Inventory', rateLabel:'Fill rate', items:[
+      {name:'Vizio — Home Screen', sub:'added 2h ago', rate:66},
+      {name:'LG Channels — Kids', sub:'added 5h ago', rate:69},
+      {name:'Tubi — Late Night', sub:'added yesterday', rate:52},
+      {name:'Pluto — News 24', sub:'added 2d ago', rate:60},
+      {name:'Sling — Sports Extra', sub:'added 3d ago', rate:44},
     ]},
-    { type:'list', title:'New Demand', items:[
-      {name:'TTD — CTV Q3 Deal', sub:'added 1h ago'},
-      {name:'DV360 — Sports PMP', sub:'added 4h ago'},
-      {name:'Amazon DSP — Movies', sub:'added yesterday'},
-      {name:'Magnite Open — West', sub:'added 2d ago'},
-      {name:'Xandr — Remnant', sub:'added 4d ago'},
+    { type:'list', title:'New Demand', rateLabel:'Won-slots rate', items:[
+      {name:'TTD — CTV Q3 Deal', sub:'added 1h ago', rate:72},
+      {name:'DV360 — Sports PMP', sub:'added 4h ago', rate:64},
+      {name:'Amazon DSP — Movies', sub:'added yesterday', rate:58},
+      {name:'Magnite Open — West', sub:'added 2d ago', rate:49},
+      {name:'Xandr — Remnant', sub:'added 4d ago', rate:37},
     ]},
   ],
   // C — activity: recent edits across entity types + an alerts feed
@@ -354,10 +361,12 @@ const SEV_ICON = {
   warning:'<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4.5 21 20H3L12 4.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 10.5v3.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="16.7" r="1.05" fill="currentColor"/></svg>',
   info:'<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16Z" stroke="currentColor" stroke-width="1.7"/><path d="M12 12V6a6 6 0 0 1 6 6h-6Z" fill="currentColor"/></svg>',
 };
+function rateClass(n){ return n>=65 ? 'good' : (n>=50 ? 'warn' : 'bad'); }
 function topCard(t){
   const rows = t.items.map(it=>{
     const badge = it.badge ? `<span class="li-badge">${it.badge}</span>` : '';
-    return `<div class="list-item"><div class="li-main"><span class="li-name">${it.name}</span><span class="li-sub">${badge}${it.sub}</span></div>${CHEV}</div>`;
+    const rate = it.rate!=null ? `<span class="li-rate li-rate--${rateClass(it.rate)}" title="${t.rateLabel||'Rate'}">${it.rate}%</span>` : '';
+    return `<div class="list-item"><div class="li-main"><span class="li-name">${it.name}</span><span class="li-sub">${badge}${it.sub}</span></div>${rate}${CHEV}</div>`;
   }).join('');
   return `<section class="dash-top">
       <header class="dash-top-head"><span class="dash-top-title">${t.title}</span><a class="dash-top-viewall">View all</a></header>
