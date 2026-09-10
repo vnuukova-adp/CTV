@@ -263,12 +263,12 @@ const BOTTOM = {
       {name:'FireTV — Sports Live', sub:'11,905 requests', rate:58},
       {name:'Apple TV — Movies', sub:'6,120 requests', rate:41},
     ]},
-    { type:'list', title:'Top Demand', rateLabel:'Won-slots rate', items:[
-      {name:'Open Exchange — CTV', sub:'$3,120 spend', rate:78},
-      {name:'PMP Deal — Sports', sub:'$1,884 spend', rate:73},
-      {name:'Programmatic Guaranteed', sub:'$1,470 spend', rate:61},
-      {name:'House Direct Tag', sub:'$980 spend', rate:55},
-      {name:'Fallback Remnant', sub:'$645 spend', rate:38},
+    { type:'list', title:'Top demand by revenue', rateLabel:'Won-slots rate', items:[
+      {name:'Open Exchange — CTV', sub:'$3,120 revenue', rate:78},
+      {name:'PMP Deal — Sports', sub:'$1,884 revenue', rate:73},
+      {name:'Programmatic Guaranteed', sub:'$1,470 revenue', rate:61},
+      {name:'House Direct Tag', sub:'$980 revenue', rate:55},
+      {name:'Fallback Remnant', sub:'$645 revenue', rate:38},
     ]},
   ],
   // B — most recently added items
@@ -291,11 +291,11 @@ const BOTTOM = {
   // C — activity: recent edits across entity types + an alerts feed
   C: [
     { type:'list', title:'Recently updated', items:[
-      {name:'Roku — CTV Prime', sub:'Inventory · updated 12m ago'},
-      {name:'TTD — CTV Q3 Deal', sub:'Demand · updated 40m ago'},
-      {name:'US East → Premium', sub:'Route · updated 1h ago'},
-      {name:'IAB Brand Safety v3', sub:'Brand Safety · updated 2h ago'},
-      {name:'FireTV — Sports Live', sub:'Inventory · updated 3h ago'},
+      {name:'Roku — CTV Prime', sub:'Inventory · updated 12m ago', rate:71, rateLabel:'Fill rate'},
+      {name:'TTD — CTV Q3 Deal', sub:'Demand · updated 40m ago', rate:72, rateLabel:'Won-slots rate'},
+      {name:'US East → Premium', sub:'Route · updated 1h ago', rate:63, rateLabel:'Fill rate'},
+      {name:'IAB Brand Safety v3', sub:'Brand Safety · updated 2h ago', rate:88, rateLabel:'Coverage'},
+      {name:'FireTV — Sports Live', sub:'Inventory · updated 3h ago', rate:58, rateLabel:'Fill rate'},
     ]},
     // Each alert is about ONE entity, so View deep-links to that entity's screen.
     { type:'attention', title:'Needs attention', count:3, items:[
@@ -365,7 +365,7 @@ function rateClass(n){ return n>=65 ? 'good' : (n>=50 ? 'warn' : 'bad'); }
 function topCard(t){
   const rows = t.items.map(it=>{
     const badge = it.badge ? `<span class="li-badge">${it.badge}</span>` : '';
-    const rate = it.rate!=null ? `<span class="li-rate li-rate--${rateClass(it.rate)}" title="${t.rateLabel||'Rate'}">${it.rate}%</span>` : '';
+    const rate = it.rate!=null ? `<span class="li-rate li-rate--${rateClass(it.rate)}" title="${it.rateLabel||t.rateLabel||'Rate'}">${it.rate}%</span>` : '';
     return `<div class="list-item"><div class="li-main"><span class="li-name">${it.name}</span><span class="li-sub">${badge}${it.sub}</span></div>${rate}${CHEV}</div>`;
   }).join('');
   return `<section class="dash-top">
