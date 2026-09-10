@@ -256,14 +256,14 @@ const VERSION_META = { A:{name:'Top lists'}, B:{name:'Recent items'}, C:{name:'A
 const BOTTOM = {
   // A — leaderboards by volume/spend
   A: [
-    { type:'list', title:'Top inventory by fill', rateLabel:'Fill rate', items:[
+    { type:'list', title:'Top Inventory by fill', rateLabel:'Fill rate', items:[
       {name:'QA Inventory', sub:'28,450 requests', rate:74},
       {name:'Roku — CTV Prime', sub:'19,220 requests', rate:71},
       {name:'Samsung TV Plus — News', sub:'8,640 requests', rate:69},
       {name:'FireTV — Sports Live', sub:'11,905 requests', rate:58},
       {name:'Apple TV — Movies', sub:'6,120 requests', rate:41},
     ]},
-    { type:'list', title:'Top demand by revenue', rateLabel:'Won-slots rate', items:[
+    { type:'list', title:'Top Demand by revenue', rateLabel:'Won-slots rate', items:[
       {name:'Open Exchange — CTV', sub:'$3,120 revenue', rate:78},
       {name:'PMP Deal — Sports', sub:'$1,884 revenue', rate:73},
       {name:'Programmatic Guaranteed', sub:'$1,470 revenue', rate:61},
@@ -369,7 +369,7 @@ function topCard(t){
     return `<div class="list-item"><div class="li-main"><span class="li-name">${it.name}</span><span class="li-sub">${badge}${it.sub}</span></div>${rate}${CHEV}</div>`;
   }).join('');
   return `<section class="dash-top">
-      <header class="dash-top-head"><span class="dash-top-title">${t.title}</span><a class="dash-top-viewall">View all</a></header>
+      <header class="dash-top-head"><span class="dash-top-title">${t.title}</span></header>
       <div class="dash-top-list">${rows}</div>
     </section>`;
 }
@@ -381,7 +381,7 @@ function attentionCard(t){
       <a class="attn-view" href="${it.href}" title="Open ${it.entity}">View</a>
     </div>`).join('');
   return `<section class="dash-top">
-      <header class="dash-top-head"><span class="dash-top-title">${t.title}</span><a class="dash-top-viewall dash-top-viewall--accent">${t.count} items</a></header>
+      <header class="dash-top-head"><span class="dash-top-title">${t.title}</span></header>
       <div class="dash-top-list">${rows}</div>
     </section>`;
 }
