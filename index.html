@@ -197,7 +197,7 @@ body{font-family:var(--font-sans);background:var(--bg-main);color:var(--text-pri
       <span class="ver-bar__label">Dashboard preview — pick a version</span>
       <div class="ver-seg" role="tablist" aria-label="Dashboard version">
         <button class="ver-seg__btn is-active" data-v="A" role="tab" aria-selected="true">A · Top lists</button>
-        <button class="ver-seg__btn" data-v="B" role="tab" aria-selected="false">B · New items</button>
+        <button class="ver-seg__btn" data-v="B" role="tab" aria-selected="false">B · Recent items</button>
         <button class="ver-seg__btn" data-v="C" role="tab" aria-selected="false">C · Activity</button>
       </div>
     </div>
@@ -252,7 +252,7 @@ const METRICS = [
   { variant:'impressions', title:'Impressions', max:24110, maxDate:'Sep 8, 2026',
     p:{ tvy:[21540,9320,9,-44], wk:[142800,131500,8,-8], mo:[612400,668900,12,9], d7:[138200,149600,10,8] } },
 ];
-const VERSION_META = { A:{name:'Top lists'}, B:{name:'New items'}, C:{name:'Activity'} };
+const VERSION_META = { A:{name:'Top lists'}, B:{name:'Recent items'}, C:{name:'Activity'} };
 const BOTTOM = {
   // A — leaderboards by volume/spend
   A: [
@@ -273,19 +273,19 @@ const BOTTOM = {
   ],
   // B — most recently added items
   B: [
-    { type:'list', title:'New Inventory', rateLabel:'Fill rate', items:[
-      {name:'Vizio — Home Screen', sub:'added 2h ago', rate:66},
-      {name:'LG Channels — Kids', sub:'added 5h ago', rate:69},
-      {name:'Tubi — Late Night', sub:'added yesterday', rate:52},
-      {name:'Pluto — News 24', sub:'added 2d ago', rate:60},
-      {name:'Sling — Sports Extra', sub:'added 3d ago', rate:44},
+    { type:'list', title:'Recent Inventory', rateLabel:'Fill rate', items:[
+      {name:'Vizio — Home Screen', sub:'updated 2h ago', rate:66},
+      {name:'LG Channels — Kids', sub:'updated 5h ago', rate:69},
+      {name:'Tubi — Late Night', sub:'updated yesterday', rate:52},
+      {name:'Pluto — News 24', sub:'updated 2d ago', rate:60},
+      {name:'Sling — Sports Extra', sub:'updated 3d ago', rate:44},
     ]},
-    { type:'list', title:'New Demand', rateLabel:'Won-slots rate', items:[
-      {name:'TTD — CTV Q3 Deal', sub:'added 1h ago', rate:72},
-      {name:'DV360 — Sports PMP', sub:'added 4h ago', rate:64},
-      {name:'Amazon DSP — Movies', sub:'added yesterday', rate:58},
-      {name:'Magnite Open — West', sub:'added 2d ago', rate:49},
-      {name:'Xandr — Remnant', sub:'added 4d ago', rate:37},
+    { type:'list', title:'Recent Demand', rateLabel:'Won-slots rate', items:[
+      {name:'TTD — CTV Q3 Deal', sub:'updated 1h ago', rate:72},
+      {name:'DV360 — Sports PMP', sub:'updated 4h ago', rate:64},
+      {name:'Amazon DSP — Movies', sub:'updated yesterday', rate:58},
+      {name:'Magnite Open — West', sub:'updated 2d ago', rate:49},
+      {name:'Xandr — Remnant', sub:'updated 4d ago', rate:37},
     ]},
   ],
   // C — activity: recent edits across entity types + an alerts feed
