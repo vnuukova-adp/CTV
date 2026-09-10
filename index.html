@@ -290,7 +290,7 @@ const BOTTOM = {
   ],
   // C — activity: recent edits across entity types + an alerts feed
   C: [
-    { type:'list', title:'Recently updated', items:[
+    { type:'list', title:'Recently updated', hideViewAll:true, items:[
       {name:'Roku — CTV Prime', sub:'Inventory · updated 12m ago', rate:71, rateLabel:'Fill rate'},
       {name:'TTD — CTV Q3 Deal', sub:'Demand · updated 40m ago', rate:72, rateLabel:'Won-slots rate'},
       {name:'US East → Premium', sub:'Route · updated 1h ago', rate:63, rateLabel:'Fill rate'},
@@ -369,7 +369,7 @@ function topCard(t){
     return `<div class="list-item"><div class="li-main"><span class="li-name">${it.name}</span><span class="li-sub">${badge}${it.sub}</span></div>${rate}${CHEV}</div>`;
   }).join('');
   return `<section class="dash-top">
-      <header class="dash-top-head"><span class="dash-top-title">${t.title}</span></header>
+      <header class="dash-top-head"><span class="dash-top-title">${t.title}</span>${t.hideViewAll ? '' : '<a class="dash-top-viewall">View all</a>'}</header>
       <div class="dash-top-list">${rows}</div>
     </section>`;
 }
