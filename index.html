@@ -284,16 +284,17 @@ const BOTTOM = {
   // C — activity: recent edits across entity types + an alerts feed
   C: [
     { type:'list', title:'Recently updated', items:[
-      {name:'Roku — CTV Prime', badge:'Inventory', sub:'updated 12m ago'},
-      {name:'TTD — CTV Q3 Deal', badge:'Demand', sub:'updated 40m ago'},
-      {name:'US East → Premium', badge:'Route', sub:'updated 1h ago'},
-      {name:'IAB Brand Safety v3', badge:'Brand Safety', sub:'updated 2h ago'},
-      {name:'FireTV — Sports Live', badge:'Inventory', sub:'updated 3h ago'},
+      {name:'Roku — CTV Prime', sub:'Inventory · updated 12m ago'},
+      {name:'TTD — CTV Q3 Deal', sub:'Demand · updated 40m ago'},
+      {name:'US East → Premium', sub:'Route · updated 1h ago'},
+      {name:'IAB Brand Safety v3', sub:'Brand Safety · updated 2h ago'},
+      {name:'FireTV — Sports Live', sub:'Inventory · updated 3h ago'},
     ]},
+    // Each alert is about ONE entity, so View deep-links to that entity's screen.
     { type:'attention', title:'Needs attention', count:3, items:[
-      {sev:'danger',  name:'Fill dropped 22% on “Roku Sports → TTD”', sub:'Started ~3h ago. Demand may have paused a deal.'},
-      {sev:'warning', name:'Error rate up on Magnite endpoint', sub:'1.7% → mostly no-bid timeouts on Pluto Movies.'},
-      {sev:'info',    name:'2 demand endpoints near daily cap', sub:'DV360 & Amazon DSP at ~90% of budget.'},
+      {sev:'danger',  name:'Fill dropped 22% on “Roku Sports → TTD”', sub:'Started ~3h ago. Demand may have paused a deal.', entity:'Roku Sports → TTD route', href:'#/route?id=roku-sports-ttd'},
+      {sev:'warning', name:'Error rate up on Magnite endpoint', sub:'1.7% → mostly no-bid timeouts on Pluto Movies.', entity:'Magnite demand endpoint', href:'#/demand?id=magnite'},
+      {sev:'info',    name:'Amazon DSP endpoint near daily cap', sub:'At ~92% of today’s budget.', entity:'Amazon DSP demand endpoint', href:'#/demand?id=amazon-dsp'},
     ]},
   ],
 };
@@ -368,7 +369,7 @@ function attentionCard(t){
     <div class="attn-item">
       <span class="attn-ico attn-ico--${it.sev}">${SEV_ICON[it.sev]}</span>
       <div class="li-main"><span class="li-name">${it.name}</span><span class="li-sub">${it.sub}</span></div>
-      <a class="attn-view">View</a>
+      <a class="attn-view" href="${it.href}" title="Open ${it.entity}">View</a>
     </div>`).join('');
   return `<section class="dash-top">
       <header class="dash-top-head"><span class="dash-top-title">${t.title}</span><a class="dash-top-viewall dash-top-viewall--accent">${t.count} items</a></header>
