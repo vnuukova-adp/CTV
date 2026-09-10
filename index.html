@@ -331,7 +331,7 @@ function metricCard(m, per){
   const rows = [
     {label:per.base, value:base,  delta:bD, spark: bD>=0?SPARK_UP:SPARK_DOWN},
     {label:per.cur,  value:cur,   delta:cD, spark: cD>=0?SPARK_UP:SPARK_DOWN},
-    {label:'MAX',    value:m.max, date:m.maxDate, spark:SPARK_MAX},
+    {label:'MAX',    value:m.max, date:m.maxDate, spark:null},
   ].map(r=>`
     <div class="dash-stat">
       <div class="dash-stat-main">
@@ -341,7 +341,7 @@ function metricCard(m, per){
           ${r.date ? `<span class="dash-stat-date">${r.date}</span>` : deltaChip(r.delta)}
         </div>
       </div>
-      ${sparkSVG(r.spark, color)}
+      ${r.spark ? sparkSVG(r.spark, color) : ''}
     </div>`).join('');
   return `<section class="dash-metric dash-metric--${m.variant}">
       <header class="dash-metric-head"><span class="dash-metric-title">${m.title}</span></header>
