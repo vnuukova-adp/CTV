@@ -18,8 +18,10 @@
   --text-placeholder:var(--black-400);
   --accent:#008bf6;
   --border-default:var(--black-100); --border-tertiary:var(--black-70); --border-input:var(--black-150);
-  --success:var(--other-green-500); --danger:var(--other-red-500);
+  --success:var(--other-green-500); --danger:var(--other-red-500); --warning:#f97316;
+  --danger-bg:#fef2f2; --warning-bg:#fff7ed; --accent-tint:#f2f9ff;
   --ghost-hover-bg:#00000008; --menu-pressed-bg:#0000000f;
+  --shadow-sm:0 1px 2px rgba(10,13,18,.05);
   --dash-revenue-fill:var(--other-emerald-500); --dash-requests-fill:var(--other-indigo-500); --dash-impressions-fill:var(--other-purple-500);
   --rail-bg:var(--black-900); --rail-icon:var(--black-500); --rail-hover-bg:var(--black-800); --rail-active-bg:var(--black-700);
   --font-sans:'Exo 2',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
@@ -133,11 +135,36 @@ body{font-family:var(--font-sans);background:var(--bg-main);color:var(--text-pri
 @media (max-width:991.98px){.dash-metrics-row{flex-direction:column}.dash-metrics-row>.dash-metric{flex:0 0 auto}}
 @media (max-width:575.98px){.dash-tops-row{flex-direction:column}.dash-tops-row>.dash-top{flex:0 0 auto}.dash-filters{grid-template-columns:1fr}}
 
-/* version banner (temporary — a toggle replaces this when Version B lands) */
-.ver-banner{width:100%;max-width:1140px;margin:20px auto 0;display:flex;align-items:center;gap:10px;
-  font-size:var(--fs-xs);color:var(--text-muted)}
-.ver-tag{font-weight:var(--fw-bold);letter-spacing:.04em;text-transform:uppercase;color:var(--text-secondary);
-  background:var(--black-50);border:1px solid var(--border-default);border-radius:var(--radius-pill);padding:3px 10px}
+/* ----- version toggle (preview control, not part of the real app) ----- */
+.ver-bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;
+  padding:10px 32px;background:rgba(248,248,248,.92);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-bottom:1px solid var(--border-default)}
+.ver-bar__label{font-size:var(--fs-xs);font-weight:var(--fw-semibold);letter-spacing:.04em;text-transform:uppercase;color:var(--text-secondary)}
+.ver-seg{display:inline-flex;background:var(--black-50);border:1px solid var(--border-default);border-radius:var(--radius-pill);padding:3px}
+.ver-seg__btn{border:0;background:transparent;font-family:var(--font-sans);font-size:13px;font-weight:var(--fw-semibold);color:var(--text-secondary);
+  padding:6px 14px;border-radius:var(--radius-pill);cursor:pointer;transition:background .12s,color .12s}
+.ver-seg__btn:hover{color:var(--text-primary)}
+.ver-seg__btn.is-active{background:var(--bg-panel);color:var(--text-primary);box-shadow:var(--shadow-sm)}
+
+/* ----- Recently-updated type badge ----- */
+.li-badge{display:inline-block;font-size:11px;font-weight:var(--fw-semibold);line-height:1;color:var(--text-muted);
+  background:var(--black-50);border:1px solid var(--border-default);border-radius:var(--radius-pill);padding:2px 7px;margin-right:6px;vertical-align:1px}
+
+/* ----- Needs-attention card ----- */
+.dash-top-viewall--accent{color:var(--accent)}
+.dash-top-viewall--accent:hover{color:var(--accent);text-decoration:underline}
+.attn-item{position:relative;display:flex;align-items:center;gap:14px;padding:16px 32px}
+.attn-item::after{content:'';position:absolute;left:32px;right:32px;bottom:0;height:1px;background:var(--border-default)}
+.attn-item:last-child::after{display:none}
+.attn-ico{flex:0 0 auto;width:36px;height:36px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center}
+.attn-ico svg{width:20px;height:20px;display:block}
+.attn-ico--danger{background:var(--danger-bg);color:var(--danger)}
+.attn-ico--warning{background:var(--warning-bg);color:var(--warning)}
+.attn-ico--info{background:var(--accent-tint);color:var(--accent)}
+.attn-item .li-main{flex:1}
+.attn-item .li-name{margin-bottom:2px}
+.attn-item .li-sub{color:var(--text-muted)}
+.attn-view{flex:0 0 auto;font-size:var(--fs-md);font-weight:var(--fw-semibold);color:var(--accent);text-decoration:none;cursor:pointer;white-space:nowrap}
+.attn-view:hover{text-decoration:underline}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 </style>
 
@@ -159,6 +186,14 @@ body{font-family:var(--font-sans);background:var(--bg-main);color:var(--text-pri
   </nav>
 
   <div class="work">
+    <div class="ver-bar">
+      <span class="ver-bar__label">Dashboard preview — pick a version</span>
+      <div class="ver-seg" role="tablist" aria-label="Dashboard version">
+        <button class="ver-seg__btn is-active" data-v="A" role="tab" aria-selected="true">A · Top lists</button>
+        <button class="ver-seg__btn" data-v="B" role="tab" aria-selected="false">B · New items</button>
+        <button class="ver-seg__btn" data-v="C" role="tab" aria-selected="false">C · Activity</button>
+      </div>
+    </div>
     <div class="dash-page">
       <header class="dash-head">
         <div class="dash-head-text">
@@ -200,33 +235,67 @@ const PERIODS = [
   { key:'mo',  label:'This month vs last', base:'Last month',  cur:'This month' },
   { key:'d7',  label:'Last 7 days',        base:'Prev 7 days', cur:'Last 7 days' },
 ];
-const VERSIONS = {
-  A: {
-    metrics: [
-      { variant:'revenue', title:'Revenue', money:true, max:6905, maxDate:'Sep 8, 2026',
-        p:{ tvy:[4812,2140,8,-18], wk:[30140,26480,12,-6], mo:[128400,140900,15,10], d7:[29600,31450,9,6] } },
-      { variant:'requests', title:'Requests', max:32664, maxDate:'Sep 8, 2026',
-        p:{ tvy:[30216,13681,12,-51], wk:[196400,181200,7,-8], mo:[842300,905600,11,8], d7:[188900,201400,9,7] } },
-      { variant:'impressions', title:'Impressions', max:24110, maxDate:'Sep 8, 2026',
-        p:{ tvy:[21540,9320,9,-44], wk:[142800,131500,8,-8], mo:[612400,668900,12,9], d7:[138200,149600,10,8] } },
-    ],
-    tops: {
-      inventory:[
-        {name:'QA Inventory',           sub:'28,450 requests'},
-        {name:'Roku — CTV Prime',       sub:'19,220 requests'},
-        {name:'FireTV — Sports Live',   sub:'11,905 requests'},
-        {name:'Samsung TV Plus — News', sub:'8,640 requests'},
-        {name:'Apple TV — Movies',      sub:'6,120 requests'},
-      ],
-      demand:[
-        {name:'Open Exchange — CTV',    sub:'$3,120 spend'},
-        {name:'PMP Deal — Sports',      sub:'$1,884 spend'},
-        {name:'Programmatic Guaranteed', sub:'$1,470 spend'},
-        {name:'House Direct Tag',       sub:'$980 spend'},
-        {name:'Fallback Remnant',       sub:'$645 spend'},
-      ],
-    },
-  },
+// Metric cards are shared across versions (period-driven). Versions differ only in
+// the two bottom cards — see BOTTOM.
+const METRICS = [
+  { variant:'revenue', title:'Revenue', money:true, max:6905, maxDate:'Sep 8, 2026',
+    p:{ tvy:[4812,2140,8,-18], wk:[30140,26480,12,-6], mo:[128400,140900,15,10], d7:[29600,31450,9,6] } },
+  { variant:'requests', title:'Requests', max:32664, maxDate:'Sep 8, 2026',
+    p:{ tvy:[30216,13681,12,-51], wk:[196400,181200,7,-8], mo:[842300,905600,11,8], d7:[188900,201400,9,7] } },
+  { variant:'impressions', title:'Impressions', max:24110, maxDate:'Sep 8, 2026',
+    p:{ tvy:[21540,9320,9,-44], wk:[142800,131500,8,-8], mo:[612400,668900,12,9], d7:[138200,149600,10,8] } },
+];
+const VERSION_META = { A:{name:'Top lists'}, B:{name:'New items'}, C:{name:'Activity'} };
+const BOTTOM = {
+  // A — leaderboards by volume/spend
+  A: [
+    { type:'list', title:'Top Inventory', items:[
+      {name:'QA Inventory', sub:'28,450 requests'},
+      {name:'Roku — CTV Prime', sub:'19,220 requests'},
+      {name:'FireTV — Sports Live', sub:'11,905 requests'},
+      {name:'Samsung TV Plus — News', sub:'8,640 requests'},
+      {name:'Apple TV — Movies', sub:'6,120 requests'},
+    ]},
+    { type:'list', title:'Top Demand', items:[
+      {name:'Open Exchange — CTV', sub:'$3,120 spend'},
+      {name:'PMP Deal — Sports', sub:'$1,884 spend'},
+      {name:'Programmatic Guaranteed', sub:'$1,470 spend'},
+      {name:'House Direct Tag', sub:'$980 spend'},
+      {name:'Fallback Remnant', sub:'$645 spend'},
+    ]},
+  ],
+  // B — most recently added items
+  B: [
+    { type:'list', title:'New Inventory', items:[
+      {name:'Vizio — Home Screen', sub:'added 2h ago'},
+      {name:'LG Channels — Kids', sub:'added 5h ago'},
+      {name:'Tubi — Late Night', sub:'added yesterday'},
+      {name:'Pluto — News 24', sub:'added 2d ago'},
+      {name:'Sling — Sports Extra', sub:'added 3d ago'},
+    ]},
+    { type:'list', title:'New Demand', items:[
+      {name:'TTD — CTV Q3 Deal', sub:'added 1h ago'},
+      {name:'DV360 — Sports PMP', sub:'added 4h ago'},
+      {name:'Amazon DSP — Movies', sub:'added yesterday'},
+      {name:'Magnite Open — West', sub:'added 2d ago'},
+      {name:'Xandr — Remnant', sub:'added 4d ago'},
+    ]},
+  ],
+  // C — activity: recent edits across entity types + an alerts feed
+  C: [
+    { type:'list', title:'Recently updated', items:[
+      {name:'Roku — CTV Prime', badge:'Inventory', sub:'updated 12m ago'},
+      {name:'TTD — CTV Q3 Deal', badge:'Demand', sub:'updated 40m ago'},
+      {name:'US East → Premium', badge:'Route', sub:'updated 1h ago'},
+      {name:'IAB Brand Safety v3', badge:'Brand Safety', sub:'updated 2h ago'},
+      {name:'FireTV — Sports Live', badge:'Inventory', sub:'updated 3h ago'},
+    ]},
+    { type:'attention', title:'Needs attention', count:3, items:[
+      {sev:'danger',  name:'Fill dropped 22% on “Roku Sports → TTD”', sub:'Started ~3h ago. Demand may have paused a deal.'},
+      {sev:'warning', name:'Error rate up on Magnite endpoint', sub:'1.7% → mostly no-bid timeouts on Pluto Movies.'},
+      {sev:'info',    name:'2 demand endpoints near daily cap', sub:'DV360 & Amazon DSP at ~90% of budget.'},
+    ]},
+  ],
 };
 const FILL = { revenue:'var(--dash-revenue-fill)', requests:'var(--dash-requests-fill)', impressions:'var(--dash-impressions-fill)' };
 const SPARK_UP=[6,7,6,8,9,10,12], SPARK_DOWN=[12,11,9,10,7,6,5], SPARK_MAX=[4,6,5,8,7,10,12];
@@ -278,30 +347,53 @@ function metricCard(m, per){
       <div class="dash-metric-body">${rows}</div>
     </section>`;
 }
+const CHEV = '<svg class="li-chev" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M9 8L13 12L9 16L11 17L16 12L11 7L9 8Z" fill="currentColor"/></svg>';
+const SEV_ICON = {
+  danger:'<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 7v6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.25" fill="currentColor"/></svg>',
+  warning:'<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4.5 21 20H3L12 4.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 10.5v3.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="16.7" r="1.05" fill="currentColor"/></svg>',
+  info:'<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16Z" stroke="currentColor" stroke-width="1.7"/><path d="M12 12V6a6 6 0 0 1 6 6h-6Z" fill="currentColor"/></svg>',
+};
 function topCard(t){
-  const chev = '<svg class="li-chev" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M9 8L13 12L9 16L11 17L16 12L11 7L9 8Z" fill="currentColor"/></svg>';
-  const list = t.items.length
-    ? `<div class="dash-top-list">${t.items.map(it=>`
-        <div class="list-item"><div class="li-main"><span class="li-name">${it.name}</span><span class="li-sub">${it.sub}</span></div>${chev}</div>`).join('')}</div>`
-    : `<div class="dash-top-empty">${t.empty||'Nothing yet'}</div>`;
+  const rows = t.items.map(it=>{
+    const badge = it.badge ? `<span class="li-badge">${it.badge}</span>` : '';
+    return `<div class="list-item"><div class="li-main"><span class="li-name">${it.name}</span><span class="li-sub">${badge}${it.sub}</span></div>${CHEV}</div>`;
+  }).join('');
   return `<section class="dash-top">
-      <header class="dash-top-head"><span class="dash-top-title">${t.title}</span>${t.viewAll?'<a class="dash-top-viewall">View all</a>':''}</header>
-      ${list}
+      <header class="dash-top-head"><span class="dash-top-title">${t.title}</span><a class="dash-top-viewall">View all</a></header>
+      <div class="dash-top-list">${rows}</div>
     </section>`;
 }
+function attentionCard(t){
+  const rows = t.items.map(it=>`
+    <div class="attn-item">
+      <span class="attn-ico attn-ico--${it.sev}">${SEV_ICON[it.sev]}</span>
+      <div class="li-main"><span class="li-name">${it.name}</span><span class="li-sub">${it.sub}</span></div>
+      <a class="attn-view">View</a>
+    </div>`).join('');
+  return `<section class="dash-top">
+      <header class="dash-top-head"><span class="dash-top-title">${t.title}</span><a class="dash-top-viewall dash-top-viewall--accent">${t.count} items</a></header>
+      <div class="dash-top-list">${rows}</div>
+    </section>`;
+}
+function bottomCard(t){ return t.type==='attention' ? attentionCard(t) : topCard(t); }
 let curVersion='A', curPeriod=PERIODS[0];
 function renderMetrics(){
-  document.getElementById('metrics').innerHTML = VERSIONS[curVersion].metrics.map(m=>metricCard(m,curPeriod)).join('');
+  document.getElementById('metrics').innerHTML = METRICS.map(m=>metricCard(m,curPeriod)).join('');
 }
 function renderTops(){
-  const t = VERSIONS[curVersion].tops;
-  const cards = [
-    { title:'Top Inventory', viewAll:true, items:t.inventory },
-    { title:'Top Demand',    viewAll:true, items:t.demand },
-  ];
-  document.getElementById('tops').innerHTML = cards.map(topCard).join('');
+  document.getElementById('tops').innerHTML = BOTTOM[curVersion].map(bottomCard).join('');
+}
+function setVersion(v){
+  curVersion = v;
+  document.querySelectorAll('.ver-seg__btn').forEach(b=>{
+    const on = b.dataset.v===v; b.classList.toggle('is-active', on); b.setAttribute('aria-selected', on);
+  });
+  renderTops();
 }
 renderMetrics(); renderTops();
+document.querySelector('.ver-seg').addEventListener('click', e=>{
+  const btn = e.target.closest('.ver-seg__btn'); if(btn) setVersion(btn.dataset.v);
+});
 
 // ---- period picker: DS-styled dropdown; selecting a range re-renders the figures ----
 (function(){
