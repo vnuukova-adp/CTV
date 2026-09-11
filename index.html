@@ -174,11 +174,9 @@ body{font-family:var(--font-sans);background:var(--bg-main);color:var(--text-pri
 .attn-item .li-sub{color:var(--text-muted)}
 .attn-view{flex:0 0 auto;font-size:var(--fs-md);font-weight:var(--fw-semibold);color:var(--accent);text-decoration:none;cursor:pointer;white-space:nowrap}
 .attn-view:hover{text-decoration:underline}
-/* ----- Version D: empty-state onboarding ("Set up your traffic chain") ----- */
-.dash-onboard{width:100%;background:var(--bg-panel);border:2px solid var(--border-tertiary);border-radius:var(--radius);padding:26px 28px 30px}
-.onb-title{margin:0 0 6px;font-size:var(--fs-xl);font-weight:var(--fw-bold);color:var(--text-primary)}
-.onb-sub{margin:0 0 22px;font-size:var(--fs-md);line-height:20px;color:var(--text-muted);max-width:760px}
-.onb-sub strong{color:var(--text-primary);font-weight:var(--fw-semibold)}
+/* ----- Version D: empty-state onboarding (ungrouped — steps sit on the page) ----- */
+.dash-onboard{width:100%}
+.dash-subtitle strong{color:var(--text-primary);font-weight:var(--fw-semibold)}
 .onb-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 .onb-step{position:relative;background:var(--bg-panel);border:1px solid var(--border-default);border-radius:var(--radius-lg);padding:18px 18px 16px;display:flex;flex-direction:column;gap:8px}
 .onb-step:not(:last-child)::after{content:'→';position:absolute;right:-14px;top:50%;transform:translateY(-50%);color:var(--black-300);font-size:15px;line-height:1;z-index:1}
@@ -223,14 +221,12 @@ body{font-family:var(--font-sans);background:var(--bg-main);color:var(--text-pri
       <header class="dash-head">
         <div class="dash-head-text">
           <h1 class="ep-view-name" id="greeting">Hello, QA Co!</h1>
-          <p class="dash-subtitle">A real-time snapshot of your CTV traffic</p>
+          <p class="dash-subtitle" id="subtitle">A real-time snapshot of your CTV traffic</p>
         </div>
         <div class="dash-timestamp" id="ts">Thu, 11 Sep 2026 08:20 UTC</div>
       </header>
 
       <section class="dash-onboard" id="emptyState" hidden>
-        <h2 class="onb-title">Set up your traffic chain</h2>
-        <p class="onb-sub">AdPlayer CTV connects <strong>supply</strong> to <strong>demand</strong> through a <strong>route</strong>. Complete these four steps and your dashboard starts reporting live.</p>
         <div class="onb-steps">
           <div class="onb-step"><span class="onb-num">1</span><h3 class="onb-step-title">Add inventory</h3><p class="onb-step-desc">Connect your CTV app, channel, or ad tag as a supply source.</p><a class="onb-link" href="#/inventory">Add inventory →</a></div>
           <div class="onb-step"><span class="onb-num">2</span><h3 class="onb-step-title">Connect demand</h3><p class="onb-step-desc">Add a DSP or ad network endpoint to buy your impressions.</p><a class="onb-link" href="#/demand">Add demand →</a></div>
@@ -446,8 +442,12 @@ function setVersion(v){
   document.querySelectorAll('.ver-seg__btn').forEach(b=>{
     const on = b.dataset.v===v; b.classList.toggle('is-active', on); b.setAttribute('aria-selected', on);
   });
-  // Version D keeps A's layout: show the progress banner and render every card empty.
-  document.getElementById('emptyState').hidden = v!=='D';
+  // Version D keeps A's layout: swap in the onboarding copy + steps, render every card empty.
+  const isD = v==='D';
+  document.getElementById('emptyState').hidden = !isD;
+  document.getElementById('subtitle').innerHTML = isD
+    ? 'Set up your traffic chain — connect <strong>supply</strong> to <strong>demand</strong> through a <strong>route</strong> to start reporting live.'
+    : 'A real-time snapshot of your CTV traffic';
   renderMetrics();
   renderTops();
 }
