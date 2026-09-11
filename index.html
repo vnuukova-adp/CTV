@@ -108,6 +108,7 @@ body{font-family:var(--font-sans);background:var(--bg-main);color:var(--text-pri
 .dash-stat-label{font-size:var(--fs-md);font-weight:var(--fw-semibold);line-height:20px;color:var(--text-secondary)}
 .dash-stat-figure{display:flex;align-items:flex-end;gap:var(--space-4);flex-wrap:wrap}
 .dash-stat-value{font-size:24px;line-height:28px;color:var(--text-primary);font-variant-numeric:tabular-nums}
+.dash-stat-value--empty{color:var(--black-300)}
 .dash-stat-date{font-size:var(--fs-xs);line-height:16px;font-weight:500;color:var(--text-secondary);margin-left:var(--space-4)}
 .dash-stat-delta{display:inline-flex;align-items:center;gap:var(--space-2);font-size:var(--fs-xs);font-weight:700}
 .dash-stat-delta svg{width:11px;height:11px}
@@ -227,6 +228,17 @@ body{font-family:var(--font-sans);background:var(--bg-main);color:var(--text-pri
         <div class="dash-timestamp" id="ts">Thu, 11 Sep 2026 08:20 UTC</div>
       </header>
 
+      <section class="dash-onboard" id="emptyState" hidden>
+        <h2 class="onb-title">Set up your traffic chain</h2>
+        <p class="onb-sub">AdPlayer CTV connects <strong>supply</strong> to <strong>demand</strong> through a <strong>route</strong>. Complete these four steps and your dashboard starts reporting live.</p>
+        <div class="onb-steps">
+          <div class="onb-step"><span class="onb-num">1</span><h3 class="onb-step-title">Add inventory</h3><p class="onb-step-desc">Connect your CTV app, channel, or ad tag as a supply source.</p><a class="onb-link" href="#/inventory">Add inventory →</a></div>
+          <div class="onb-step"><span class="onb-num">2</span><h3 class="onb-step-title">Connect demand</h3><p class="onb-step-desc">Add a DSP or ad network endpoint to buy your impressions.</p><a class="onb-link" href="#/demand">Add demand →</a></div>
+          <div class="onb-step"><span class="onb-num">3</span><h3 class="onb-step-title">Create a route</h3><p class="onb-step-desc">Link supply to demand with targeting and floor rules.</p><a class="onb-link" href="#/route">Create route →</a></div>
+          <div class="onb-step"><span class="onb-num">4</span><h3 class="onb-step-title">See your stats</h3><p class="onb-step-desc">Send test traffic and watch requests and fill come in.</p><a class="onb-link" href="#/stats">View stats →</a></div>
+        </div>
+      </section>
+
       <div class="dash-filters">
         <div class="field__control">
           <svg class="field__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 19V10H6V19H9ZM16 17H13V15H16V17ZM16 13H13V11H16V13ZM16 9H13V7H16V9ZM18 5H11V7.53613C10.4116 7.19564 9.72875 7 9 7V5C9 3.89543 9.89543 3 11 3H18C19.1046 3 20 3.89543 20 5V19H22V21H2V19H4V10C4 8.89543 4.89543 8 6 8H9C10.1046 8 11 8.89543 11 10V19H18V5Z" fill="currentColor"/></svg>
@@ -243,17 +255,6 @@ body{font-family:var(--font-sans);background:var(--bg-main);color:var(--text-pri
 
       <div class="dash-metrics-row" id="metrics"></div>
       <div class="dash-tops-row" id="tops"></div>
-
-      <section class="dash-onboard" id="emptyState" hidden>
-        <h2 class="onb-title">Set up your traffic chain</h2>
-        <p class="onb-sub">AdPlayer CTV connects <strong>supply</strong> to <strong>demand</strong> through a <strong>route</strong>. Complete these four steps and your dashboard starts reporting live.</p>
-        <div class="onb-steps">
-          <div class="onb-step"><span class="onb-num">1</span><h3 class="onb-step-title">Add inventory</h3><p class="onb-step-desc">Connect your CTV app, channel, or ad tag as a supply source.</p><a class="onb-link" href="#/inventory">Add inventory →</a></div>
-          <div class="onb-step"><span class="onb-num">2</span><h3 class="onb-step-title">Connect demand</h3><p class="onb-step-desc">Add a DSP or ad network endpoint to buy your impressions.</p><a class="onb-link" href="#/demand">Add demand →</a></div>
-          <div class="onb-step"><span class="onb-num">3</span><h3 class="onb-step-title">Create a route</h3><p class="onb-step-desc">Link supply to demand with targeting and floor rules.</p><a class="onb-link" href="#/route">Create route →</a></div>
-          <div class="onb-step"><span class="onb-num">4</span><h3 class="onb-step-title">See your stats</h3><p class="onb-step-desc">Send test traffic and watch requests and fill come in.</p><a class="onb-link" href="#/stats">View stats →</a></div>
-        </div>
-      </section>
     </div>
   </div>
 </div>
@@ -359,21 +360,31 @@ function deltaChip(delta){
     : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M7 7 17 17M17 9v8H9"/></svg>';
   return `<span class="dash-stat-delta dash-stat-delta--${cls}">${arrow}${Math.abs(delta)}%</span>`;
 }
-function metricCard(m, per){
+function metricCard(m, per, empty){
   const color = FILL[m.variant];
   const fmt = m.money ? fmtMoney : fmtNum;
-  const [base,cur,bD,cD] = m.p[per.key];
-  const rows = [
-    {label:per.base, value:base,  delta:bD, spark: bD>=0?SPARK_UP:SPARK_DOWN},
-    {label:per.cur,  value:cur,   delta:cD, spark: cD>=0?SPARK_UP:SPARK_DOWN},
-    {label:'MAX',    value:m.max, date:m.maxDate, spark:null},
-  ].map(r=>`
+  let rowsData;
+  if(empty){
+    rowsData = [
+      {label:per.base, value:'—'},
+      {label:per.cur,  value:'—'},
+      {label:'MAX',    value:'—'},
+    ];
+  } else {
+    const [base,cur,bD,cD] = m.p[per.key];
+    rowsData = [
+      {label:per.base, value:fmt(base), delta:bD, spark: bD>=0?SPARK_UP:SPARK_DOWN},
+      {label:per.cur,  value:fmt(cur),  delta:cD, spark: cD>=0?SPARK_UP:SPARK_DOWN},
+      {label:'MAX',    value:fmt(m.max), date:m.maxDate},
+    ];
+  }
+  const rows = rowsData.map(r=>`
     <div class="dash-stat">
       <div class="dash-stat-main">
         <span class="dash-stat-label">${r.label}</span>
         <div class="dash-stat-figure">
-          <span class="dash-stat-value">${fmt(r.value)}</span>
-          ${r.date ? `<span class="dash-stat-date">${r.date}</span>` : deltaChip(r.delta)}
+          <span class="dash-stat-value${r.value==='—'?' dash-stat-value--empty':''}">${r.value}</span>
+          ${r.date ? `<span class="dash-stat-date">${r.date}</span>` : (r.delta!=null ? deltaChip(r.delta) : '')}
         </div>
       </div>
       ${r.spark ? sparkSVG(r.spark, color) : ''}
@@ -391,14 +402,16 @@ const SEV_ICON = {
 };
 function rateClass(n){ return n>=65 ? 'good' : (n>=50 ? 'warn' : 'bad'); }
 function topCard(t){
-  const rows = t.items.map(it=>{
-    const badge = it.badge ? `<span class="li-badge">${it.badge}</span>` : '';
-    const rate = it.rate!=null ? `<span class="li-rate li-rate--${rateClass(it.rate)}" title="${it.rateLabel||t.rateLabel||'Rate'}">${it.rate}%</span>` : '';
-    return `<div class="list-item"><div class="li-main"><span class="li-name">${it.name}</span><span class="li-sub">${badge}${it.sub}</span></div>${rate}${CHEV}</div>`;
-  }).join('');
+  const body = t.empty
+    ? `<div class="dash-top-empty">${t.empty}</div>`
+    : `<div class="dash-top-list">${t.items.map(it=>{
+        const badge = it.badge ? `<span class="li-badge">${it.badge}</span>` : '';
+        const rate = it.rate!=null ? `<span class="li-rate li-rate--${rateClass(it.rate)}" title="${it.rateLabel||t.rateLabel||'Rate'}">${it.rate}%</span>` : '';
+        return `<div class="list-item"><div class="li-main"><span class="li-name">${it.name}</span><span class="li-sub">${badge}${it.sub}</span></div>${rate}${CHEV}</div>`;
+      }).join('')}</div>`;
   return `<section class="dash-top">
-      <header class="dash-top-head"><span class="dash-top-title">${t.title}</span>${t.hideViewAll ? '' : '<a class="dash-top-viewall">View all</a>'}</header>
-      <div class="dash-top-list">${rows}</div>
+      <header class="dash-top-head"><span class="dash-top-title">${t.title}</span>${(t.hideViewAll||t.empty) ? '' : '<a class="dash-top-viewall">View all</a>'}</header>
+      ${body}
     </section>`;
 }
 function attentionCard(t){
@@ -415,24 +428,28 @@ function attentionCard(t){
 }
 function bottomCard(t){ return t.type==='attention' ? attentionCard(t) : topCard(t); }
 let curVersion='A', curPeriod=PERIODS[0];
+// Version D = A's layout, but the progress banner shows and every card is empty.
+const EMPTY_BOTTOM = [
+  { type:'list', title:'Top Inventory by fill', empty:'No inventory yet' },
+  { type:'list', title:'Top Demand by revenue', empty:'No demand yet' },
+];
 function renderMetrics(){
-  document.getElementById('metrics').innerHTML = METRICS.map(m=>metricCard(m,curPeriod)).join('');
+  const empty = curVersion==='D';
+  document.getElementById('metrics').innerHTML = METRICS.map(m=>metricCard(m,curPeriod,empty)).join('');
 }
 function renderTops(){
-  document.getElementById('tops').innerHTML = BOTTOM[curVersion].map(bottomCard).join('');
+  const cards = curVersion==='D' ? EMPTY_BOTTOM : BOTTOM[curVersion];
+  document.getElementById('tops').innerHTML = cards.map(bottomCard).join('');
 }
 function setVersion(v){
   curVersion = v;
   document.querySelectorAll('.ver-seg__btn').forEach(b=>{
     const on = b.dataset.v===v; b.classList.toggle('is-active', on); b.setAttribute('aria-selected', on);
   });
-  // Version D is the empty state: hide the live data area, show the onboarding card.
-  const empty = v==='D';
-  document.querySelector('.dash-filters').hidden = empty;
-  document.getElementById('metrics').hidden = empty;
-  document.getElementById('tops').hidden = empty;
-  document.getElementById('emptyState').hidden = !empty;
-  if(!empty) renderTops();
+  // Version D keeps A's layout: show the progress banner and render every card empty.
+  document.getElementById('emptyState').hidden = v!=='D';
+  renderMetrics();
+  renderTops();
 }
 renderMetrics(); renderTops();
 document.querySelector('.ver-seg').addEventListener('click', e=>{
